@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddressOptionStoreRequest;
 use App\Models\Addresse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,51 +18,39 @@ class AddresseController extends Controller
         return Inertia::render("Address/index");
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return Inertia::render("Address/Add");
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(AddressOptionStoreRequest $request)
     {
-        //
+        try {
+            $address = new Addresse();
+            $address->first_name = $request->first_name;
+            $address->last_name = $request->last_name;
+            $address->addr1 = $request->addr1;
+            $address->addr2 = $request->addr2;
+            $address->city = $request->city;
+            $address->postcode = $request->postcode;
+            $address->country = $request->country;
+            $address->user_id = auth()->id();
+            $address->save();
+            return redirect()->route('address.index');
+        }catch (\Exception $e) {
+            return response()->json('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Addresse $addresse)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Addresse $addresse)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Addresse $addresse)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Addresse $addresse)
-    {
-        //
+        try {
+            $address = Addresse::find($id);
+            $address->delete();
+            return redirect()->route('address.index');
+        }catch (\Exception $e) {
+            return response()->json('error', $e->getMessage());
+        }
     }
 }
